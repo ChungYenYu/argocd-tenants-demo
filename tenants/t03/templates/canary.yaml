@@ -3,6 +3,7 @@ kind: Canary
 metadata:
   name: podinfo
 spec:
+  provider: kubernetes
   targetRef:
     apiVersion: apps/v1
     kind: Deployment
