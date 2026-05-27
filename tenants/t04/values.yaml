@@ -1,0 +1,4 @@
+# Tenant t04 (onboarded via git push)
+image:
+  repository: ghcr.io/stefanprodan/podinfo
+  tag: "6.7.1"
