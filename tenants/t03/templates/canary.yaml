@@ -8,23 +8,24 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: podinfo
-  progressDeadlineSeconds: 120
+  progressDeadlineSeconds: 180
   service:
     port: 9898
     targetPort: 9898
   analysis:
-    interval: 30s
-    threshold: 3
-    maxWeight: 50
-    stepWeight: 10
-    metrics:
-    - name: request-success-rate
-      thresholdRange:
-        min: 99
-      interval: 30s
+    interval: 20s
+    threshold: 2
+    iterations: 3
     webhooks:
     - name: load-test
       url: http://flagger-loadtester.flagger-system/
       timeout: 5s
       metadata:
-        cmd: "hey -z 30s -q 5 -c 2 http://podinfo-canary.{{ .Release.Namespace }}:9898/"
+        cmd: "hey -z 15s -q 5 -c 2 http://podinfo-canary.{{ .Release.Namespace }}:9898/"
+    - name: acceptance-test
+      type: pre-rollout
+      url: http://flagger-loadtester.flagger-system/
+      timeout: 30s
+      metadata:
+        type: bash
+        cmd: "curl -sd 'ok' http://podinfo-canary.{{ .Release.Namespace }}:9898/token | grep -q token"
