@@ -1,0 +1,29 @@
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: podinfo
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: podinfo
+  progressDeadlineSeconds: 120
+  service:
+    port: 9898
+    targetPort: 9898
+  analysis:
+    interval: 30s
+    threshold: 3
+    maxWeight: 50
+    stepWeight: 10
+    metrics:
+    - name: request-success-rate
+      thresholdRange:
+        min: 99
+      interval: 30s
+    webhooks:
+    - name: load-test
+      url: http://flagger-loadtester.flagger-system/
+      timeout: 5s
+      metadata:
+        cmd: "hey -z 30s -q 5 -c 2 http://podinfo-canary.{{ .Release.Namespace }}:9898/"
